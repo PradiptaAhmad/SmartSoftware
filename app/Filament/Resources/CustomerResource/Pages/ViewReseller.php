@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Filament\Monitoring\Pages;
+namespace App\Filament\Resources\CustomerResource\Pages;
 
 use App\Models\Reseller;
-use Filament\Pages\Page;
 use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\Page;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Section;
+use App\Filament\Resources\CustomerResource;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Components\Actions\Action;
-use Illuminate\Http\Request;
 
-class ViewResellerMonitoring extends Page implements HasForms, HasInfolists
+class ViewReseller extends Page implements HasForms, HasInfolists
 {
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
-
-    protected static string $view = 'filament.monitoring.pages.view-reseller-monitoring';
+    protected static string $resource = CustomerResource::class;
+    protected static ?string $title = 'Detail Reseller';
+    protected static string $view = 'filament.resources.customer-resource.pages.view-reseller';
 
     protected $data;
 
-    public function mount(Request $request)
+    public function mount($record)
     {
-        $this->data = Reseller::where('kode', $request->record)->firstOrFail();
+        $this->data = Reseller::where('kode', $record)->firstOrFail();
     }
     public function resellerInfolist(Infolist $infolist): Infolist
     {

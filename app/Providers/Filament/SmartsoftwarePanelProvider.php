@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\CustomLogin;
 use App\Filament\Pages\Dashboard;
+use App\Http\Middleware\ValidateFilamentActiveToken;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -53,6 +54,7 @@ class SmartsoftwarePanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                ValidateFilamentActiveToken::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

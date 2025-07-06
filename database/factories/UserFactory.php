@@ -24,14 +24,19 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'no_registrasi' => fake()->unique()->numberBetween(1, 999),
-            'status' => fake()->boolean(),
-            'nama' => fake()->name(),
-            'software_id' => 'reg-' . Str::random(16),
+            'user_reg' => fake()->name(),
+            'aktif' => fake()->boolean(),
+            'softid' => 'softid-' . Str::random(16),
             'kontak' => fake()->phoneNumber(),
-            'saldo' => fake()->numberBetween(1000, 200000),
+            'tgl_backup' => now(),
+            'versi' => '1.0.0',
+            'saldo' => fake()->numberBetween(10000, 200000),
+            'online' => fake()->boolean(),
+            'upline' => fake()->numerify('###'),
+            'lvl_akses' => fake()->numberBetween(0, 5),
+            'allow_ip' => fake()->ipv4(),
+            'last_ip' => fake()->ipv4(),
             'expired' => fake()->dateTime(now()->addYear()),
-            'keterangan_deposit' => fake()->sentence(),
             'remember_token' => Str::random(10),
         ];
     }

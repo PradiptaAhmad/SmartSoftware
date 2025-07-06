@@ -13,20 +13,8 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->boolean('aktif')->default(true);
-            $table->string('nama', 255)->nullable();
             $table->string('user_reg', 50);
-            $table->string('softid', 255);
-            $table->string('kontak', 255)->nullable();
-            $table->timestamp('tgl_backup')->useCurrent();
-            $table->string('versi', 12)->nullable();
-            $table->boolean('online')->default(true)->nullable();;
-            $table->integer('saldo')->default(0);
-            $table->integer('upline')->nullable();
-            $table->integer('lvl_akses')->default(0);
-            $table->ipAddress('allow_ip')->nullable();
-            $table->ipAddress('last_ip')->nullable();
-            $table->timestamp('expired');
+            $table->text('auth_token')->nullable();
             $table->rememberToken();
 
             $table->timestamps();
@@ -53,6 +41,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }

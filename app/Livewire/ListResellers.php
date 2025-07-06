@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Exports\ResellerExport;
+use App\Filament\Resources\CustomerResource\Pages\ViewReseller;
 use App\Filament\Resources\UserResource\Pages\ViewResellerPage;
 use App\Models\Reseller;
 use Livewire\Component;
@@ -38,7 +39,7 @@ class ListResellers extends Component implements HasTable, HasForms
             ->modifyQueryUsing(function (Builder $query) {
                 $query->where('kode_customer', $this->record->id);
             })
-            ->recordUrl(fn(Reseller $record) => ViewResellerPage::getUrl(['record' => $record->kode]))
+            ->recordUrl(fn(Reseller $record) => ViewReseller::getUrl(['record' => $record->kode]))
             ->headerActions([
                 Action::make('export_excel')
                     ->label('Export Excel')
@@ -47,7 +48,7 @@ class ListResellers extends Component implements HasTable, HasForms
                     ->action(function () {
                         return Excel::download(new ResellerExport($this->record->id), 'reseller_' . $this->record->id . '_' . now()->format('Ymd_His') . '.xlsx');
                     }),
-                ], HeaderActionsPosition::Adaptive)
+            ], HeaderActionsPosition::Adaptive)
             ->columns([
                 IconColumn::make('aktif')
                     ->icon(fn(bool $state) => $state ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')

@@ -2,21 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Sushi\Sushi;
+use App\Services\ApiService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Reseller extends Model
 {
-    use HasUuids, HasFactory;
+    use HasUuids, HasFactory, Sushi;
 
-    protected $table = 'reseller';
-    protected $primaryKey = 'kode';
-    public $incrementing = false;
-    protected $keyType = 'string';
-    const CREATED_AT = 'tgl_daftar';
-    const UPDATED_AT= 'tgl_aktivitas';
+    // protected $table = 'reseller';
+    // protected $primaryKey = 'kode';
+    // public $incrementing = false;
+    // protected $keyType = 'string';
+    // const CREATED_AT = 'tgl_daftar';
+    // const UPDATED_AT= 'tgl_aktivitas';
 
     protected $fillable = [
         'kode',
@@ -55,8 +57,21 @@ class Reseller extends Model
         ];
     }
 
-    public function user(): BelongsTo
+    public function getRows()
     {
-        return $this->belongsTo(User::class, 'kode_user', 'id');
+        $apiService = new ApiService();
+        $resellers = collect(
+            value: $apiService->get(
+                endpoint: '/r',
+                authToken: auth()->user()->auth_token,
+            )->json()
+        );
+
+        return $resellers->toArray();
     }
+
+    // public function user(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class, 'kode_user', 'id');
+    // }
 }

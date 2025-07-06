@@ -24,19 +24,7 @@ class User extends Authenticatable implements FilamentUser, HasName
      */
     protected $fillable = [
         'user_reg',
-        'aktif',
-        'nama',
-        'softid',
-        'kontak',
-        'tgl_backup',
-        'versi',
-        'saldo',
-        'online',
-        'upline',
-        'lvl_akses',
-        'allow_ip',
-        'last_ip',
-        'expired',
+        'auth_token',
         'remember_token',
     ];
 
@@ -46,7 +34,6 @@ class User extends Authenticatable implements FilamentUser, HasName
      * @var list<string>
      */
     protected $hidden = [
-        'password',
         'remember_token',
     ];
 
@@ -79,6 +66,6 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     public function getFilamentName(): string
     {
-        return $this->nama;
+        return $this->user_reg;
     }
 }
