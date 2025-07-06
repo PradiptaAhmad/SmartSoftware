@@ -27,14 +27,13 @@ class ListMutasi extends Component implements HasForms, HasTable
     {
         return $table
             ->query(\App\Models\Mutasi::query())
-            ->modifyQueryUsing(function ($query) {
-                $query->where('kode_customer', $this->record->id);
-            })
             ->searchable(false)
+            ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('jumlah')
                     ->label('Jumlah')
-                    ->sortable(),
+                    ->sortable()
+                    ->money('IDR', true),
                 TextColumn::make('saldo')
                     ->label('Saldo')
                     ->money('IDR', true)

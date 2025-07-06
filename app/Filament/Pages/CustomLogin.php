@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\User;
+use App\Services\ApiService;
 use Filament\Forms\Form;
 use Filament\Facades\Filament;
 use Filament\Pages\Auth\Login;
@@ -20,15 +21,15 @@ class CustomLogin extends Login
     {
         return $form
             ->schema([
-                TextInput::make('no_registrasi')
+                TextInput::make('id')
                     ->label('No Registrasi')
                     ->required()
                     ->numeric(),
-                TextInput::make('nama')
+                TextInput::make('user_reg')
                     ->label('Nama Server')
                     ->required()
                     ->maxLength(255),
-                TextInput::make('software_id')
+                TextInput::make('softid')
                     ->label('Software ID')
                     ->required()
                     ->maxLength(255),
@@ -48,6 +49,7 @@ class CustomLogin extends Login
 
     public function authenticate(): ?LoginResponse
     {
+        $apiService = new ApiService();
         try {
             $this->rateLimit(5);
         } catch (TooManyRequestsException $exception) {
@@ -59,17 +61,34 @@ class CustomLogin extends Login
 
         $data = $this->form->getState();
 
-        $user = User::where([
-            'user_reg' => $data['no_registrasi'] ?? null,
-            'nama' => $data['nama'] ?? null,
-            'softid' => $data['software_id'] ?? null,
-        ])->first();
-
-        if (!$user) {
+        $login = $apiService->post(
+            endpoint: '/login',
+            data: [
+                'id' => $data['id'],
+                'user_reg' => $data['user_reg'],
+                'softid' => $data['softid'],
+                'fe' => 'web'
+            ]
+        );
+        if ($login->failed()) {
             $this->throwFailureValidationException();
         }
+        $user = User::where('user_reg', $login['data']['user_reg'])
+            ->first();
+
+        if (!$user) {
+            $user = User::create([
+                'user_reg' => $login['data']['user_reg'],
+                'auth_token' => $login['token'] ?? null,
+            ]);
+        } else {
+            $user->update([
+                'user_reg' => $login['data']['user_reg'],
+                'auth_token' => $login['token'] ?? null
+            ]);
+        }
+
         Filament::auth()->login($user, $data['remember'] ?? false);
-        $user = Filament::auth()->user();
 
         if (
             ($user instanceof FilamentUser) &&
@@ -80,9 +99,7 @@ class CustomLogin extends Login
             $this->throwFailureValidationException();
         }
 
-
         session()->regenerate();
-
         return app(LoginResponse::class);
     }
 }

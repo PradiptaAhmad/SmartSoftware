@@ -19,6 +19,7 @@ class ListResellersTable extends BaseWidget
 {
     protected static ?int $sort = 2;
     protected int | string | array $columnSpan = 'full';
+    
 
 
     public function table(Table $table): Table
@@ -29,17 +30,14 @@ class ListResellersTable extends BaseWidget
             ->query(
                 Reseller::query()
             )
-            ->modifyQueryUsing(function ($query) use ($user) {
-                return $query->where('kode_customer', $user->id);
-            })
-            ->recordUrl(fn (Reseller $record) => ViewResellerMonitoring::getUrl(['record' => $record->kode]))
+            ->recordUrl(fn(Reseller $record) => ViewResellerMonitoring::getUrl(['record' => $record->kode]))
             ->headerActions([
                 Action::make('export_excel')
                     ->label('Export Excel')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('primary')
-                    ->action(function () {
-                        return Excel::download(new ResellerExport(auth()->user()->id), 'reseller_' . $this->record->id . '_' . now()->format('Ymd_His') . '.xlsx');
+                    ->action(function (Action $action) {
+                        return Excel::download(new ResellerExport(), 'reseller_' . auth()->user()->user_reg . '_' . now()->format('Ymd_His') . '.xlsx');
                     }),
             ], HeaderActionsPosition::Adaptive)
             ->columns([

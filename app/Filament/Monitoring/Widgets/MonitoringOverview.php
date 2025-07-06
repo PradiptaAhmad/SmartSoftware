@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Filament\Monitoring\Widgets;
 
+use App\Services\ApiService;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -8,14 +10,16 @@ class MonitoringOverview extends BaseWidget
 {
     protected function getStats(): array
     {
-        $user = auth()->user();
+        $user = $this->getUserData();
+        $resellers = $this->getResellersData();
 
-        $user_reg = $user->user_reg;
-        $nama = $user->nama;
-        $total_reseller = $user->resellers->count();
-        $total_saldo = $user->resellers->sum('saldo');
+        $user_reg = $user['id'];
+        $nama = $user['user_reg'];
+        $total_reseller = $resellers->count();
+        $total_saldo = $resellers->sum('saldo');
         $biaya_sewa = $total_reseller * 25;
-        $saldo_deposit = $user->saldo;
+
+        $saldo_deposit = $user['saldo'];
 
         return [
             Stat::make('No Registrasi', $user_reg)
@@ -31,5 +35,35 @@ class MonitoringOverview extends BaseWidget
             Stat::make('Saldo Deposit', 'Rp ' . number_format($saldo_deposit, 0, ',', '.'))
                 ->icon('heroicon-o-credit-card'),
         ];
+    }
+
+    public function getUserData()
+    {
+        $apiService = new ApiService();
+        $response = $apiService->get(
+            endpoint: '/profile',
+            authToken: auth()->user()->auth_token,
+        );
+        if ($response->successful()) {
+            return collect(
+                value: $response->json()
+            );
+        }
+        return collect([]);
+    }
+
+    public function getResellersData()
+    {
+        $apiService = new ApiService();
+        $response = $apiService->get(
+            endpoint: '/r',
+            authToken: auth()->user()->auth_token,
+        );
+        if ($response->successful()) {
+            return collect(
+                value: $response->json()
+            );
+        }
+        return collect([]);
     }
 }

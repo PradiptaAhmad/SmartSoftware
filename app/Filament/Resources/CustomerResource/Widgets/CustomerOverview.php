@@ -1,26 +1,29 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Filament\Resources\CustomerResource\Widgets;
 
-use App\Models\User;
-use App\Services\ApiService;
-use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\Concerns\InteractsWithPageTable;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use App\Filament\Resources\CustomerResource\Pages\ListCustomers;
+use App\Models\Customer;
 
-class DashboardOverview extends BaseWidget
+class CustomerOverview extends BaseWidget
 {
-    // protected int|string|array $columnSpan = 15;
+    use InteractsWithPageTable;
+
+    protected static ?string $pollingInterval = null;
+
+    protected function getTablePage()
+    {
+        return ListCustomers::class;
+    }
+
     protected function getStats(): array
     {
-        $apiService = new ApiService();
-        $customers = collect(
-            value: $apiService->get(
-                endpoint: '/c',
-                authToken: auth()->user()->auth_token,
-            )->json()
-        );
-        $active_customers = $customers->where('aktif', '1')->count();
-        $inactive_customers = $customers->where('aktif', '0')->count();
+        $customers = Customer::all();
+        $active_customers = $customers->where('aktif', true)->count();
+        $inactive_customers = $customers->where('aktif', false)->count();
 
         return [
             Stat::make('Total Customer', $customers->count())
